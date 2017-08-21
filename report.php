@@ -219,7 +219,7 @@ class quiz_gradingstudents_report extends quiz_default_report {
                 $reviewlink = get_string('attemptid', 'quiz_gradingstudents', $attempt->attemptnumber);
             }
             $row = array();
-            $row[] = format_string($attempt->idnumber);
+            $row[] = fullname($attempt);
             $row[] = $reviewlink;
             $row[] = $this->format_count_for_table($attempt, 'needsgrading', 'grade');
             $row[] = $this->format_count_for_table($attempt, 'manuallygraded', 'updategrade');
@@ -287,7 +287,7 @@ class quiz_gradingstudents_report extends quiz_default_report {
         echo question_engine::initialise_js();
 
         require_once($CFG->dirroot . '/mod/quiz/report/gradingstudents/examconfirmationcode.php');
-        $pi = $attempt->idnumber;
+        $pi = fullname($attempt);
         $pi = $pi ? get_string('personalidentifier', 'quiz_gradingstudents', $pi) : '';
 
         $cfmcode = quiz_gradingstudents_report_exam_confirmation_code::get_confirmation_code(
@@ -385,11 +385,11 @@ class quiz_gradingstudents_report extends quiz_default_report {
         $params['state'] = 'finished';
         $sql = "SELECT qa.id AS attemptid, qa.uniqueid, qa.attempt AS attemptnumber,
                        qa.quiz AS quizid, qa.layout, qa.userid, qa.timefinish,
-                       qa.preview, qa.state, u.idnumber
+                       qa.preview, qa.state, u.*
                   FROM {user} u
                   JOIN {quiz_attempts} qa ON u.id = qa.userid
                  WHERE u.id $usql AND qa.quiz = :quizid AND qa.state = :state
-              ORDER BY u.idnumber ASC, attemptid ASC";
+              ORDER BY u.lastname ASC, u.firstname ASC, attemptid ASC";
         return $DB->get_records_sql($sql, $params);
     }
 
